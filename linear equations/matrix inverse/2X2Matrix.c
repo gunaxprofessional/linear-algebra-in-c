@@ -22,7 +22,7 @@ int main()
     {
         for (j = 0; j < 2; j++)
         {
-            matrix[i][j] = matrix[i][j] / (1.0 / det);
+            matrix[i][j] = matrix[i][j] / det;
             printf("%.2f ", matrix[i][j]);
         }
         printf("%.2f ", matrix[i][j]);
