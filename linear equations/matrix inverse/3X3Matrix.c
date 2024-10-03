@@ -2,11 +2,32 @@
 
 int main()
 {
-    double A[3][4] = {1, 2, 3, 9,
-                      2, 3, 1, 8,
-                      3, 1, 2, 7};
+    int unknows;
+    int i, j;
+    int rows, cols;
 
+    printf("Enter Total unknows: ");
+    scanf("%d", &unknows);
+    rows = unknows, cols = unknows + 1;
+
+    double A[rows][cols];
     double det1, det2, det3, det;
+    double minors[3][3];
+
+    printf("Enter the agument matrix: \n");
+    printf("Example:\n");
+    printf("1 2 3 9\n");
+    printf("2 3 1 8\n");
+    printf("3 1 2 7\n");
+
+    for (i = 0; i < rows; i++)
+    {
+        for (j = 0; j < cols; j++)
+        {
+            printf("%d th %d th ", i, j);
+            scanf("%lf", &A[i][j]);
+        }
+    }
 
     det1 = (A[0][0] * ((A[1][1] * A[2][2]) - (A[1][2] * A[2][1])));
     det2 = (-A[0][1] * ((A[1][0] * A[2][2]) - (A[1][2] * A[2][0])));
@@ -14,8 +35,6 @@ int main()
 
     det = det1 + det2 + det3;
     printf("The determinant: %.2f \n", det);
-
-    double minors[3][3];
 
     minors[0][0] = (A[1][1] * A[2][2]) - (A[1][2] * A[2][1]);
     minors[0][1] = (A[1][0] * A[2][2]) - (A[1][2] * A[2][0]);
@@ -95,12 +114,11 @@ int main()
 
     double result[3] = {0, 0, 0};
 
-    int i, j;
     i = 0, j = 0;
 
     for (i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (j = 0; j < 3; j++)
         {
             result[j] += (inverse[j][i] * A[i][3]);
         }
