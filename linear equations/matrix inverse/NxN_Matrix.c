@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Function to get the cofactor of a matrix
 void getCofactor(double **mat, double **temp, int p, int q, int n)
@@ -123,6 +124,31 @@ int main()
     // Calculate the determinant of the coefficient matrix
     double det = determinantOfMatrix(Coefficient, unknows);
     printf("The determinant of the matrix is: %lf\n", det);
+
+    double **minor = (double **)calloc(rows, sizeof(double *));
+    for (int i = 0; i < rows; i++)
+    {
+        minor[i] = (double *)calloc(cols, sizeof(double));
+        memcpy(minor[i], Coefficient[i], rows * sizeof(double));
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            minor[i][j] = determinantOfMatrix(Coefficient, unknows)
+        }
+    }
+
+    printf("The inverse: \n");
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            printf("%.2f ", inverse[i][j]);
+        }
+        printf("\n");
+    }
 
     // Free the allocated memory for the coefficient matrix
     for (int i = 0; i < rows; i++)
