@@ -112,6 +112,7 @@ int main()
     {
         for (j = 0; j < unknowns + 1; j++)
         {
+            printf("Enter %dth %dth value: ");
             if (j == unknowns)
             {
                 scanf("%lf", &constants[i]); // Last column (constants)
