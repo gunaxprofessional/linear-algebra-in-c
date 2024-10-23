@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 // Function to get the cofactor of a matrix
 void getCofactor(double **mat, double **temp, int p, int q, int n)
@@ -35,64 +34,85 @@ double determinantOfMatrix(double **mat, int n)
     if (n == 1)
         return mat[0][0];
 
-    // Allocate memory for cofactor matrix dynamically
-    double **temp = (double **)malloc(n * sizeof(double *));
-    for (int i = 0; i < n; i++)
-        temp[i] = (double *)malloc(n * sizeof(double));
-
     int sign = 1; // To store sign multiplier
+
+    // Allocate memory for temporary matrix
+    double **Cofactor = (double **)malloc((n - 1) * sizeof(double *));
+    for (int i = 0; i < n - 1; i++)
+        Cofactor[i] = (double *)malloc((n - 1) * sizeof(double));
 
     // Iterate for each element of the first row
     for (int f = 0; f < n; f++)
     {
         // Getting the cofactor of mat[0][f]
-        getCofactor(mat, temp, 0, f, n);
-        det += sign * mat[0][f] * determinantOfMatrix(temp, n - 1);
+        getCofactor(mat, Cofactor, 0, f, n);
+        det += sign * mat[0][f] * determinantOfMatrix(Cofactor, n - 1);
 
         // Alternate signs
         sign = -sign;
     }
 
-    // Free allocated memory for temp matrix
-    for (int i = 0; i < n; i++)
-        free(temp[i]);
-    free(temp);
+    // Free allocated memory for temp matrix (cofactor matrix)
+    for (int i = 0; i < n - 1; i++)
+        free(Cofactor[i]);
+    free(Cofactor);
 
     return det;
 }
 
-int main()
+// Function to calculate minors of the matrix
+void calculateMinors(double **mat, double **minors, int n)
 {
-    int unknows, i, j;
-    int rows, cols;
+    double **temp = (double **)malloc((n - 1) * sizeof(double *));
+    for (int i = 0; i < n - 1; i++)
+        temp[i] = (double *)malloc((n - 1) * sizeof(double));
 
-    printf("Enter total unknowns: ");
-    scanf("%d", &unknows);
-    rows = unknows;
-    cols = unknows;
-
-    // Allocate memory for coefficient matrix dynamically
-    double **Coefficient = (double **)calloc(rows, sizeof(double *));
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < n; i++)
     {
-        Coefficient[i] = (double *)calloc(cols, sizeof(double));
+        for (int j = 0; j < n; j++)
+        {
+            getCofactor(mat, temp, i, j, n);                                               // Get cofactor for element (i, j)
+            minors[i][j] = ((i + j) % 2 == 0 ? 1 : -1) * determinantOfMatrix(temp, n - 1); // Apply checkerboard sign pattern
+        }
     }
 
-    double constants[rows];
+    // Free memory allocated for temp matrix
+    for (int i = 0; i < n - 1; i++)
+        free(temp[i]);
+    free(temp);
+}
+
+int main()
+{
+    int unknowns, i, j;
+
+    printf("Enter total unknowns: ");
+    scanf("%d", &unknowns);
+
+    // Allocate memory for coefficient matrix dynamically
+    double **Coefficient = (double **)calloc(unknowns, sizeof(double *));
+    for (int i = 0; i < unknowns; i++)
+        Coefficient[i] = (double *)calloc(unknowns, sizeof(double));
+
+    // Allocate memory for minors matrix
+    double **minors = (double **)malloc(unknowns * sizeof(double *));
+    for (int i = 0; i < unknowns; i++)
+        minors[i] = (double *)malloc(unknowns * sizeof(double));
+
+    // Allocate memory for inverse matrix
+    double **inverse = (double **)malloc(unknowns * sizeof(double *));
+    for (int i = 0; i < unknowns; i++)
+        inverse[i] = (double *)malloc(unknowns * sizeof(double));
+
+    double constants[unknowns], result[unknowns];
 
     // Input the augmented matrix
     printf("Enter the augmented matrix (coefficients and constants):\n");
-    printf("Example:\n");
-    printf("Coefficient of x, Coefficient of y, Coefficient of z, constant\n");
-    printf("1 2 3 9\n");
-    printf("2 3 1 8\n");
-    printf("3 1 2 7\n");
-    for (i = 0; i < rows; i++)
+    for (i = 0; i < unknowns; i++)
     {
-        for (j = 0; j < cols + 1; j++)
+        for (j = 0; j < unknowns + 1; j++)
         {
-            printf("%d th %d th ", i, j);
-            if (j == cols)
+            if (j == unknowns)
             {
                 scanf("%lf", &constants[i]); // Last column (constants)
             }
@@ -105,11 +125,11 @@ int main()
 
     // Output the matrix for verification
     printf("\nThe entered matrix is:\n");
-    for (i = 0; i < rows; i++)
+    for (i = 0; i < unknowns; i++)
     {
-        for (j = 0; j < cols + 1; j++)
+        for (j = 0; j < unknowns + 1; j++)
         {
-            if (j == cols)
+            if (j == unknowns)
             {
                 printf("%lf ", constants[i]);
             }
@@ -122,40 +142,75 @@ int main()
     }
 
     // Calculate the determinant of the coefficient matrix
-    double det = determinantOfMatrix(Coefficient, unknows);
+    double det = determinantOfMatrix(Coefficient, unknowns);
     printf("The determinant of the matrix is: %lf\n", det);
 
-    double **minor = (double **)calloc(rows, sizeof(double *));
-    for (int i = 0; i < rows; i++)
+    if (det == 0)
     {
-        minor[i] = (double *)calloc(cols, sizeof(double));
-        memcpy(minor[i], Coefficient[i], rows * sizeof(double));
+        printf("The matrix is singular and does not have an inverse.\n");
+        return 0;
     }
 
-    for (int i = 0; i < rows; i++)
+    // Calculate minors
+    calculateMinors(Coefficient, minors, unknowns);
+
+    // Transpose the minors matrix (Adjugate)
+    for (int i = 0; i < unknowns; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = i + 1; j < unknowns; j++)
         {
-            minor[i][j] = determinantOfMatrix(Coefficient, unknows)
+            double temp = minors[i][j];
+            minors[i][j] = minors[j][i];
+            minors[j][i] = temp;
         }
     }
 
-    printf("The inverse: \n");
-    for (int i = 0; i < 3; i++)
+    // Calculate inverse by dividing adjugate matrix by the determinant
+    for (int i = 0; i < unknowns; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < unknowns; j++)
+        {
+            inverse[i][j] = minors[i][j] / det;
+        }
+    }
+
+    printf("The inverse matrix is:\n");
+    for (i = 0; i < unknowns; i++)
+    {
+        for (j = 0; j < unknowns; j++)
         {
             printf("%.2f ", inverse[i][j]);
         }
         printf("\n");
     }
 
-    // Free the allocated memory for the coefficient matrix
-    for (int i = 0; i < rows; i++)
+    // Solve the system of equations using the inverse matrix
+    for (i = 0; i < unknowns; i++)
+    {
+        result[i] = 0;
+        for (j = 0; j < unknowns; j++)
+        {
+            result[i] += inverse[i][j] * constants[j];
+        }
+    }
+
+    // Print the results
+    printf("The result is:\n");
+    for (i = 0; i < unknowns; i++)
+    {
+        printf("Variable %d: %.5f\n", i + 1, result[i]);
+    }
+
+    // Free the allocated memory
+    for (i = 0; i < unknowns; i++)
     {
         free(Coefficient[i]);
+        free(minors[i]);
+        free(inverse[i]);
     }
     free(Coefficient);
+    free(minors);
+    free(inverse);
 
     return 0;
 }
