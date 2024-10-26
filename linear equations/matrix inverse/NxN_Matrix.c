@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Function to get the cofactor of a matrix
 void getCofactor(double **mat, double **temp, int p, int q, int n)
 {
     int i = 0, j = 0;
-
-    // Loop through the matrix to copy elements into the cofactor matrix
     for (int row = 0; row < n; row++)
     {
         for (int col = 0; col < n; col++)
@@ -25,18 +22,15 @@ void getCofactor(double **mat, double **temp, int p, int q, int n)
     }
 }
 
-// Recursive function to calculate the determinant
 double determinantOfMatrix(double **mat, int n)
 {
     double det = 0;
 
-    // Base case: if matrix contains a single element
     if (n == 1)
         return mat[0][0];
 
-    int sign = 1; // To store sign multiplier
+    int sign = 1;
 
-    // Allocate memory for temporary matrix
     double **Cofactor = (double **)malloc((n - 1) * sizeof(double *));
     for (int i = 0; i < n - 1; i++)
         Cofactor[i] = (double *)malloc((n - 1) * sizeof(double));
@@ -52,7 +46,6 @@ double determinantOfMatrix(double **mat, int n)
         sign = -sign;
     }
 
-    // Free allocated memory for temp matrix (cofactor matrix)
     for (int i = 0; i < n - 1; i++)
         free(Cofactor[i]);
     free(Cofactor);
@@ -60,7 +53,6 @@ double determinantOfMatrix(double **mat, int n)
     return det;
 }
 
-// Function to calculate minors of the matrix
 void calculateMinors(double **mat, double **minors, int n)
 {
     double **temp = (double **)malloc((n - 1) * sizeof(double *));
@@ -76,7 +68,6 @@ void calculateMinors(double **mat, double **minors, int n)
         }
     }
 
-    // Free memory allocated for temp matrix
     for (int i = 0; i < n - 1; i++)
         free(temp[i]);
     free(temp);
@@ -89,24 +80,20 @@ int main()
     printf("Enter total unknowns: ");
     scanf("%d", &unknowns);
 
-    // Allocate memory for coefficient matrix dynamically
     double **Coefficient = (double **)calloc(unknowns, sizeof(double *));
     for (int i = 0; i < unknowns; i++)
         Coefficient[i] = (double *)calloc(unknowns, sizeof(double));
 
-    // Allocate memory for minors matrix
     double **minors = (double **)malloc(unknowns * sizeof(double *));
     for (int i = 0; i < unknowns; i++)
         minors[i] = (double *)malloc(unknowns * sizeof(double));
 
-    // Allocate memory for inverse matrix
     double **inverse = (double **)malloc(unknowns * sizeof(double *));
     for (int i = 0; i < unknowns; i++)
         inverse[i] = (double *)malloc(unknowns * sizeof(double));
 
     double constants[unknowns], result[unknowns];
 
-    // Input the augmented matrix
     printf("Enter the augmented matrix (coefficients and constants):\n");
     for (i = 0; i < unknowns; i++)
     {
@@ -119,12 +106,11 @@ int main()
             }
             else
             {
-                scanf("%lf", &Coefficient[i][j]); // Coefficients
+                scanf("%lf", &Coefficient[i][j]);
             }
         }
     }
 
-    // Output the matrix for verification
     printf("\nThe entered matrix is:\n");
     for (i = 0; i < unknowns; i++)
     {
@@ -142,7 +128,6 @@ int main()
         printf("\n");
     }
 
-    // Calculate the determinant of the coefficient matrix
     double det = determinantOfMatrix(Coefficient, unknowns);
     printf("The determinant of the matrix is: %lf\n", det);
 
@@ -195,14 +180,12 @@ int main()
         }
     }
 
-    // Print the results
     printf("The result is:\n");
     for (i = 0; i < unknowns; i++)
     {
         printf("Variable %d: %.5f\n", i + 1, result[i]);
     }
 
-    // Free the allocated memory
     for (i = 0; i < unknowns; i++)
     {
         free(Coefficient[i]);
