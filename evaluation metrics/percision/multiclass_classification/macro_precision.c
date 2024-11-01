@@ -5,6 +5,8 @@ int main()
     int y_true[6] = {0, 1, 2, 0, 1, 2};
     int y_pred[6] = {0, 2, 1, 0, 0, 1};
     int total_sample = sizeof(y_pred) / sizeof(y_pred[0]);
+    int total_class = 0;
+
     int total_matches = 0;
     for (int i = 0; i < total_sample; i++)
     {
